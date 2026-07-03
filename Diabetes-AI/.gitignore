@@ -10,7 +10,3 @@ frontend/dist/
 # Runtime artifacts
 data/prediction_history.csv
 model/*.png
-model/*.csv
-model/*.json
-model/*.npy
-model/*.npz

@@ -243,10 +243,22 @@ GEMINI_API_KEY=your_gemini_key
 GEMINI_MODEL=gemini-2.5-flash
 ```
 
+The Render build runs `python model/train_model.py`, so the deployed backend has both prediction files and analytics artifacts. Keep `data/diabetes.csv` in the repository because training depends on it.
+
 After deployment, verify:
 
 ```text
 https://your-render-service.onrender.com/api/health
+```
+
+Then verify analytics endpoints:
+
+```text
+https://your-render-service.onrender.com/api/analytics/summary
+https://your-render-service.onrender.com/api/analytics/model-comparison
+https://your-render-service.onrender.com/api/analytics/feature-importance
+https://your-render-service.onrender.com/api/analytics/confusion-matrix
+https://your-render-service.onrender.com/api/analytics/roc
 ```
 
 ### Frontend on Vercel

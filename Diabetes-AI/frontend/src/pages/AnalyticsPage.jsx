@@ -28,23 +28,36 @@ export default function AnalyticsPage() {
   const [confusion, setConfusion] = useState([]);
   const [roc, setRoc] = useState({ fpr: [], tpr: [] });
   const [history, setHistory] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const run = async () => {
-      const [s, c, fi, cm, rc, h] = await Promise.all([
-        getSummary(),
-        getModelComparison(),
-        getFeatureImportance(),
-        getConfusionMatrix(),
-        getRoc(),
-        getHistory(),
-      ]);
-      setSummary(s);
-      setComparison(c.rows || []);
-      setImportance(fi.rows || []);
-      setConfusion(cm.matrix || []);
-      setRoc(rc || { fpr: [], tpr: [] });
-      setHistory(h.rows || []);
+      setLoading(true);
+      setError("");
+      try {
+        const [s, c, fi, cm, rc, h] = await Promise.all([
+          getSummary(),
+          getModelComparison(),
+          getFeatureImportance(),
+          getConfusionMatrix(),
+          getRoc(),
+          getHistory(),
+        ]);
+        setSummary(s);
+        setComparison(c.rows || []);
+        setImportance(fi.rows || []);
+        setConfusion(cm.matrix || []);
+        setRoc(rc || { fpr: [], tpr: [] });
+        setHistory(h.rows || []);
+      } catch (requestError) {
+        setError(
+          requestError?.response?.data?.detail ||
+            "Analytics data could not be loaded. Check that the backend URL is correct and the analytics artifacts exist on the deployed backend."
+        );
+      } finally {
+        setLoading(false);
+      }
     };
     run();
   }, []);
@@ -58,6 +71,14 @@ export default function AnalyticsPage() {
     <div>
       <h1 className="page-title">Analytics</h1>
       <p className="page-subtitle">Interactive model and dataset insights in one view.</p>
+
+      {loading && <div className="disclaimer">Loading analytics...</div>}
+      {error && <div className="error-box">{error}</div>}
+      {!loading && !error && summary?.dataset?.available === false && (
+        <div className="error-box">
+          Dataset analytics are unavailable because <strong>data/diabetes.csv</strong> is missing on the backend.
+        </div>
+      )}
 
       <div className="metrics-grid">
         <div className="metric-card">
@@ -99,6 +120,11 @@ export default function AnalyticsPage() {
                   <td>{Number(row["ROC-AUC"]).toFixed(3)}</td>
                 </tr>
               ))}
+              {!comparison.length && (
+                <tr>
+                  <td colSpan="6">No model comparison data available. Redeploy the backend after generating model artifacts.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -173,6 +199,11 @@ export default function AnalyticsPage() {
                   <td>{row.Age}</td>
                 </tr>
               ))}
+              {!history.length && (
+                <tr>
+                  <td colSpan="6">No prediction history yet.</td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -180,4 +211,3 @@ export default function AnalyticsPage() {
     </div>
   );
 }
-
