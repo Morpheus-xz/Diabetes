@@ -24,6 +24,15 @@ app = FastAPI(
     version="1.0.0",
     description="API for early diabetes risk prediction and educational health assistance.",
 )
+@app.get("/")
+def root():
+    return {
+        "status": "online",
+        "service": "AI Diabetes Prediction API",
+        "version": "1.0.0",
+        "health": "/api/health",
+        "docs": "/docs"
+    }
 
 app.add_middleware(
     CORSMiddleware,
