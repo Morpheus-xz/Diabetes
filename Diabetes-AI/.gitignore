@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.DS_Store
+.env
+.venv/
+venv/
+frontend/node_modules/
+frontend/dist/
+
+# Runtime artifacts
+data/prediction_history.csv
+model/*.png
+model/*.csv
+model/*.json
+model/*.npy
+model/*.npz
